@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: ids-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mlanalytics
+      POSTGRES_USER: mluser
+      POSTGRES_PASSWORD: mlpass
+    ports:
+      - "5433:5432"
+    volumes:
+      - ids_postgres_data:/var/lib/postgresql/data
+      - ./sql/init_ids_alerts.sql:/docker-entrypoint-initdb.d/init_ids_alerts.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mluser -d mlanalytics"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ids_postgres_data:
+
