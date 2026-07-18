@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+ids_venv/
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Runtime captures and generated flow data
+pcaps/
+*.pcap
+*.pcapng
+csv/
+logs/
+run_logs/
+out/
+checkpoints/
+
+# Spark and Hadoop runtime noise
+spark-warehouse/
+metastore_db/
+derby.log
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
