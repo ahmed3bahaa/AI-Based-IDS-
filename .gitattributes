@@ -11,3 +11,4 @@
 .gitignore text eol=lf
 
 RF-20/**/metadata/part-* text eol=lf
+*.svg text eol=lf

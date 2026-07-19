@@ -1,148 +1,250 @@
-# AI-Based Intrusion Detection System for IoT Traffic
+﻿<a id="readme-top"></a>
 
-An end-to-end intrusion detection pipeline that simulates attacks against an ESP32/IoT target, captures live packets, extracts CICFlowMeter-style flow features, classifies traffic with a trained Spark ML Random Forest model, and stores actionable alerts in PostgreSQL.
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
 
-The project is designed for a Linux/Ubuntu lab environment with Mininet and an ESP32 or reachable test service on the LAN. It is useful for demonstrating AI-assisted network monitoring, IoT attack simulation, and real-time alert generation.
+<br />
+<div align="center">
+  <a href="https://github.com/ahmed3bahaa/AI-Based-IDS-">
+    <img src="docs/images/logo-placeholder.svg" alt="AI-Based Intrusion Detection System for IoT Traffic logo placeholder" width="90" height="90">
+  </a>
 
-## What This Project Does
+  <h3 align="center">AI-Based Intrusion Detection System for IoT Traffic</h3>
 
-- Builds a Mininet topology with three attack hosts and a NAT uplink to the physical LAN.
-- Generates HTTP, TCP, and MQTT traffic toward an ESP32 target and MQTT broker.
-- Captures traffic with `dumpcap` on the Mininet NAT interface.
-- Converts PCAP chunks to CIC-style CSV flow records with CICFlowMeter.
-- Streams new CSV files into Apache Spark Structured Streaming.
-- Loads the saved `RF-20` Spark ML pipeline model.
-- Maps model predictions to attack names such as `DoS_Hulk`, `PortScan`, `DDoS`, `Bot`, web attacks, and `Heartbleed`.
-- Applies a 10-second rule aggregation layer to reduce noisy per-flow predictions into alert windows.
-- Writes non-benign alerts to PostgreSQL for dashboards, analysis, or reporting.
+  <p align="center">
+    End-to-end IoT intrusion detection pipeline that captures traffic, extracts CIC-style flow features, classifies streams with a Spark ML Random Forest model, and stores alerts in PostgreSQL.
+    <br />
+    <a href="docs/GITHUB_DESCRIPTION.md"><strong>Explore the docs Â»</strong></a>
+    <br />
+    <br />
+    <a href="#usage">View Usage</a>
+    &middot;
+    <a href="https://github.com/ahmed3bahaa/AI-Based-IDS-/issues/new">Report Bug</a>
+    &middot;
+    <a href="https://github.com/ahmed3bahaa/AI-Based-IDS-/issues/new">Request Feature</a>
+  </p>
+</div>
 
-## Repository Structure
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#about-the-project">About The Project</a><ul><li><a href="#built-with">Built With</a></li></ul></li>
+    <li><a href="#getting-started">Getting Started</a><ul><li><a href="#prerequisites">Prerequisites</a></li><li><a href="#installation">Installation</a></li></ul></li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#how-it-works">How It Works</a></li>
+    <li><a href="#project-structure">Project Structure</a></li>
+    <li><a href="#validation">Validation</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
 
-```text
-.
-├── RF-20/                    # Saved Spark ML pipeline model
-├── capture.sh                # Live packet capture using dumpcap
-├── cic_schema.json           # Spark schema for CICFlowMeter CSV files
-├── docker-compose.yml        # Local PostgreSQL deployment for IDS alerts
-├── gen_schema.py             # Helper to regenerate cic_schema.json from sample CSV
-├── ids_streaming.py          # Spark Structured Streaming IDS engine
-├── mininet_attack.py         # Mininet attack traffic generator
-├── pcap_to_csv.sh            # Convert latest PCAP to CSV with CICFlowMeter
-├── run_live_detection.sh     # Orchestrates attack, capture, and conversion
-├── sql/init_ids_alerts.sql   # PostgreSQL alert table schema
-└── docs/                     # Architecture, deployment, and GitHub publishing notes
-```
+## About The Project
 
-Generated folders such as `csv/`, `pcaps/`, `logs/`, `run_logs/`, and `checkpoints/` are intentionally ignored by Git.
+[![Project overview placeholder][project-screenshot]](#usage)
 
-## System Requirements
+End-to-end IoT intrusion detection pipeline that captures traffic, extracts CIC-style flow features, classifies streams with a Spark ML Random Forest model, and stores alerts in PostgreSQL.
 
-Use Ubuntu or another Linux environment that supports Mininet. Packet capture and Mininet setup require `sudo`.
+The repository currently offers:
 
-Core tools:
+- Mininet topology with attack hosts and NAT uplink
+- HTTP, TCP, and MQTT traffic generation toward IoT targets
+- Packet capture with dumpcap
+- PCAP to CIC-style CSV conversion
+- Spark Structured Streaming classifier
+- Saved RF-20 Random Forest model
+- PostgreSQL alert storage and SQL initialization
 
-- Python 3.10+
-- Java 8, 11, or 17 supported by your Spark installation
-- Apache Spark 3.5+
+This README follows the shared template requested for the repository set and keeps the claims limited to files and documentation present in this project.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Built With
+
+- Python
+- Apache Spark
+- PostgreSQL
+- Docker Compose
 - Mininet
-- Open vSwitch
-- Wireshark CLI tools, especially `dumpcap`
-- CICFlowMeter CLI
-- PostgreSQL, or Docker Compose for the included database setup
-- MQTT client tools such as `mosquitto-clients`
-- `curl` and `netcat`
+- CICFlowMeter
+- Bash
 
-Example Ubuntu packages:
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-```bash
-sudo apt update
-sudo apt install -y python3 python3-pip mininet openvswitch-switch wireshark-common \
-  tshark curl netcat-openbsd mosquitto-clients docker.io docker-compose-plugin
-```
+## Getting Started
 
-Install Python dependencies:
+Follow these steps to clone the repository and run the project locally.
 
-```bash
-python3 -m venv ids_venv
-source ids_venv/bin/activate
-pip install -r requirements.txt
-```
+### Prerequisites
 
-## Quick Start
+- Linux or Ubuntu lab environment
+- Python and pip
+- Docker Compose for database services
+- Mininet and capture tools for live lab use
 
-1. Clone the repository:
+### Installation
 
-```bash
+~~~bash
 git clone https://github.com/ahmed3bahaa/AI-Based-IDS-.git
 cd AI-Based-IDS-
-```
-
-2. Copy the environment template and adjust the target IPs:
-
-```bash
 cp .env.example .env
-nano .env
-set -a
-source .env
-set +a
-```
+pip install -r requirements.txt
+docker compose up -d
+~~~
 
-3. Start PostgreSQL:
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-```bash
-docker compose up -d postgres
-```
+## Usage
 
-4. Run the attack/capture/conversion pipeline:
+Useful commands and entry points:
 
-```bash
+~~~bash
 bash run_live_detection.sh
-```
+~~~
 
-5. Start live Spark detection:
+~~~bash
+bash capture.sh
+~~~
 
-```bash
-spark-submit --packages org.postgresql:postgresql:42.7.3 ids_streaming.py
-```
+~~~bash
+python ids_streaming.py
+~~~
 
-6. Inspect generated alerts:
+~~~bash
+python mininet_attack.py
+~~~
 
-```bash
-docker compose exec postgres psql -U mluser -d mlanalytics \
-  -c "SELECT window_start, src_ip, dst_ip, rule_attack_name, flow_count, pkt_count FROM ids_alerts ORDER BY id DESC LIMIT 20;"
-```
+### Visual Placeholders
 
-## How The Detection Works
+Placeholder images are included under `docs/images/` so you can replace them manually later without changing the README layout.
 
-`ids_streaming.py` watches `CSV_DIR` for new CICFlowMeter CSV files. Each file is read with the committed `cic_schema.json`, normalized to the feature names expected by the saved Spark pipeline, and passed through the `RF-20` model.
+<p align="center">
+  <img src="docs/images/project-overview-placeholder.svg" alt="AI-Based Intrusion Detection System for IoT Traffic overview placeholder" width="48%">
+  <img src="docs/images/workflow-placeholder.svg" alt="AI-Based Intrusion Detection System for IoT Traffic workflow placeholder" width="48%">
+</p>
 
-The model output is then aggregated by source, destination, and 10-second time windows. The rule layer promotes important patterns into final alerts:
+Suggested final visuals:
 
-- many unique destination ports becomes `PortScan`
-- high flow or packet counts becomes `DoS_HighRate`
-- repeated model votes become web, bot, infiltration, or Heartbleed alerts
-- benign windows are ignored before writing to PostgreSQL
+- Project overview screenshot or main terminal output.
+- Workflow, architecture, or data-flow diagram.
+- Example result, dashboard, report, or generated artifact screenshot.
+- Short GIF only when it is small and useful.
 
-Thresholds are configurable through environment variables such as `PORTSCAN_PORTS`, `DOS_FLOWS`, `DOS_PKTS`, `WEB_VOTES`, and `BOT_VOTES`.
+Avoid committing large raw videos, private datasets, credentials, runtime logs, or generated secrets. Use sanitized screenshots and diagrams.
 
-## Important Environment Variables
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-| Variable | Purpose | Default |
-| --- | --- | --- |
-| `ESP_IP` | IoT victim/ESP32 IP address | `192.168.151.210` |
-| `BROKER_IP` | MQTT broker IP address | `192.168.150.137` |
-| `UPLINK` | VM interface that reaches the LAN | `enp0s3` |
-| `IFACE` | Mininet NAT capture interface | `nat0-eth0` |
-| `CSV_DIR` | Directory watched by Spark for CIC CSV files | `./csv` |
-| `MODEL_PATH` | Saved Spark ML model path | `./RF-20` |
-| `PG_HOST` / `PG_PORT` | PostgreSQL host and port | `localhost:5433` |
-| `PG_TABLE` | Alert table name | `ids_alerts` |
+## How It Works
 
-## Safety Notice
+`	ext
+Mininet or LAN traffic -> packet capture -> PCAP to CSV -> Spark model RF-20 -> prediction label -> PostgreSQL IDS alerts
+`
 
-Run traffic generation only in a lab network or against systems you own and have permission to test. The Mininet script can produce high request volumes by design.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Project Status
+## Project Structure
 
-This repository contains the live detection engine, attack/capture automation, saved model artifact, schema, and deployment helpers. Future improvements could add a dashboard, model retraining notebooks, CI checks, and sample anonymized CSV fixtures.
+- ids_streaming.py - streaming detection pipeline
+- mininet_attack.py - attack traffic lab script
+- capture.sh and pcap_to_csv.sh - packet capture and feature extraction helpers
+- sql/ - database initialization
+- RF-20/ - saved Spark ML model artifacts
+- docs/ - architecture and deployment guides
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Validation
+
+Run the most relevant checks for this repository:
+
+~~~bash
+python -m py_compile ids_streaming.py mininet_attack.py gen_schema.py
+~~~
+
+~~~bash
+docker compose config
+~~~
+
+Some validations depend on local tools, services, datasets, API credentials, or a configured lab environment.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Roadmap
+
+- [ ] Replace placeholder images with final screenshots or diagrams.
+- [ ] Keep setup commands synchronized with the current project files.
+- [ ] Add more examples or test fixtures when the project grows.
+- [ ] Add a repository-level license if the project will be reused outside its original context.
+
+See the [open issues](https://github.com/ahmed3bahaa/AI-Based-IDS-/issues) for proposed features and known issues.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Contributing
+
+Contributions are welcome for documentation, examples, tests, and implementation improvements.
+
+1. Fork the project.
+2. Create your feature branch:
+
+   ~~~bash
+   git checkout -b feature/AmazingFeature
+   ~~~
+
+3. Commit your changes:
+
+   ~~~bash
+   git commit -m "Add some AmazingFeature"
+   ~~~
+
+4. Push to the branch:
+
+   ~~~bash
+   git push origin feature/AmazingFeature
+   ~~~
+
+5. Open a pull request.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Top Contributors
+
+<a href="https://github.com/ahmed3bahaa/AI-Based-IDS-/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ahmed3bahaa/AI-Based-IDS-" alt="Top contributors for AI-Based Intrusion Detection System for IoT Traffic" />
+</a>
+
+## License
+
+No repository-level license file was verified in this project. Add a license before reuse or distribution outside the intended coursework, lab, or prototype context.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Contact
+
+Project owner: [@ahmed3bahaa](https://github.com/ahmed3bahaa)
+
+Project Link: [https://github.com/ahmed3bahaa/AI-Based-IDS-](https://github.com/ahmed3bahaa/AI-Based-IDS-)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Acknowledgments
+
+- README structure adapted from [ahmed3bahaa/readme-template](https://github.com/ahmed3bahaa/readme-template).
+- Project files, reports, fixtures, and documentation included in this repository.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+[contributors-shield]: https://img.shields.io/github/contributors/ahmed3bahaa/AI-Based-IDS-.svg?style=for-the-badge
+[contributors-url]: https://github.com/ahmed3bahaa/AI-Based-IDS-/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/ahmed3bahaa/AI-Based-IDS-.svg?style=for-the-badge
+[forks-url]: https://github.com/ahmed3bahaa/AI-Based-IDS-/network/members
+[stars-shield]: https://img.shields.io/github/stars/ahmed3bahaa/AI-Based-IDS-.svg?style=for-the-badge
+[stars-url]: https://github.com/ahmed3bahaa/AI-Based-IDS-/stargazers
+[issues-shield]: https://img.shields.io/github/issues/ahmed3bahaa/AI-Based-IDS-.svg?style=for-the-badge
+[issues-url]: https://github.com/ahmed3bahaa/AI-Based-IDS-/issues
+[project-screenshot]: docs/images/project-overview-placeholder.svg
