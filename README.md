@@ -7,16 +7,13 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/ahmed3bahaa/AI-Based-IDS-">
-    <img src="docs/images/logo-placeholder.svg" alt="AI-Based Intrusion Detection System for IoT Traffic logo placeholder" width="90" height="90">
-  </a>
 
   <h3 align="center">AI-Based Intrusion Detection System for IoT Traffic</h3>
 
   <p align="center">
     End-to-end IoT intrusion detection pipeline that captures traffic, extracts CIC-style flow features, classifies streams with a Spark ML Random Forest model, and stores alerts in PostgreSQL.
     <br />
-    <a href="docs/GITHUB_DESCRIPTION.md"><strong>Explore the docs Â»</strong></a>
+    <a href="docs/GITHUB_DESCRIPTION.md"><strong>Explore the docs</strong></a>
     <br />
     <br />
     <a href="#usage">View Usage</a>
@@ -46,7 +43,9 @@
 
 ## About The Project
 
-[![Project overview placeholder][project-screenshot]](#usage)
+<p align="center">
+  <img src="docs/images/ConfusionMatrix.png" alt="Confusion matrix" width="86%">
+</p>
 
 End-to-end IoT intrusion detection pipeline that captures traffic, extracts CIC-style flow features, classifies streams with a Spark ML Random Forest model, and stores alerts in PostgreSQL.
 
@@ -60,7 +59,6 @@ The repository currently offers:
 - Saved RF-20 Random Forest model
 - PostgreSQL alert storage and SQL initialization
 
-This README follows the shared template requested for the repository set and keeps the claims limited to files and documentation present in this project.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -119,31 +117,31 @@ python ids_streaming.py
 python mininet_attack.py
 ~~~
 
-### Visual Placeholders
+### Model Evaluation
 
-Placeholder images are included under `docs/images/` so you can replace them manually later without changing the README layout.
+These charts show the current model evaluation artifacts saved with the project. They make the Random Forest results visible before anyone has to rerun the whole live capture and Spark pipeline.
 
 <p align="center">
-  <img src="docs/images/project-overview-placeholder.svg" alt="AI-Based Intrusion Detection System for IoT Traffic overview placeholder" width="48%">
-  <img src="docs/images/workflow-placeholder.svg" alt="AI-Based Intrusion Detection System for IoT Traffic workflow placeholder" width="48%">
+  <img src="docs/images/ConfusionMatrix.png" alt="Confusion matrix" width="48%">
+  <img src="docs/images/F1.png" alt="F1 score chart" width="48%">
 </p>
 
-Suggested final visuals:
+<p align="center">
+  <img src="docs/images/FalsePositive.png" alt="False positive chart" width="48%">
+  <img src="docs/images/Persecion.png" alt="Precision chart" width="48%">
+</p>
 
-- Project overview screenshot or main terminal output.
-- Workflow, architecture, or data-flow diagram.
-- Example result, dashboard, report, or generated artifact screenshot.
-- Short GIF only when it is small and useful.
-
-Avoid committing large raw videos, private datasets, credentials, runtime logs, or generated secrets. Use sanitized screenshots and diagrams.
+<p align="center">
+  <img src="docs/images/Recall.png" alt="Recall chart" width="48%">
+</p>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## How It Works
 
-`	ext
+```text
 Mininet or LAN traffic -> packet capture -> PCAP to CSV -> Spark model RF-20 -> prediction label -> PostgreSQL IDS alerts
-`
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -170,18 +168,16 @@ python -m py_compile ids_streaming.py mininet_attack.py gen_schema.py
 docker compose config
 ~~~
 
-Some validations depend on local tools, services, datasets, API credentials, or a configured lab environment.
+Live checks need the matching local services, datasets, credentials, or lab tools installed first.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Roadmap
 
-- [ ] Replace placeholder images with final screenshots or diagrams.
-- [ ] Keep setup commands synchronized with the current project files.
-- [ ] Add more examples or test fixtures when the project grows.
-- [ ] Add a repository-level license if the project will be reused outside its original context.
-
-See the [open issues](https://github.com/ahmed3bahaa/AI-Based-IDS-/issues) for proposed features and known issues.
+- Add more labelled IoT traffic scenarios so the model can be compared across normal, scan, TCP, HTTP, and MQTT behavior.
+- Document the dataset preparation steps in more detail, especially the columns expected by the Spark streaming job.
+- Add a small dashboard or report export for reviewing stored alerts from PostgreSQL.
+- Keep the Mininet lab scripts aligned with the Docker and database setup.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -220,7 +216,7 @@ Contributions are welcome for documentation, examples, tests, and implementation
 
 ## License
 
-No repository-level license file was verified in this project. Add a license before reuse or distribution outside the intended coursework, lab, or prototype context.
+This repository does not include a root license yet. Add one before reusing or distributing the project outside its original coursework, lab, or prototype context.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -247,4 +243,3 @@ Project Link: [https://github.com/ahmed3bahaa/AI-Based-IDS-](https://github.com/
 [stars-url]: https://github.com/ahmed3bahaa/AI-Based-IDS-/stargazers
 [issues-shield]: https://img.shields.io/github/issues/ahmed3bahaa/AI-Based-IDS-.svg?style=for-the-badge
 [issues-url]: https://github.com/ahmed3bahaa/AI-Based-IDS-/issues
-[project-screenshot]: docs/images/project-overview-placeholder.svg
